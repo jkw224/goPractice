@@ -5,21 +5,31 @@ import (
 )
 
 func main() {
-	for n := range factorial(4) {
+	// send multiple #s into multiple channels
+	c := gen()
+	//
+	f := factorial(c)
+	for n := range f {
 		fmt.Println(n)
 	}
 }
 
-func factorial(num int) chan int {
+func factorial(c <-chan int) <-chan int {
 	out := make(chan int)
 	go func() {
-		total := 1
-		for num > 0 {
-			total *= num
-			num--
+		for n := range c {
+			out <- fact(n)
 		}
-		out <- total
 		close(out)
 	}()
 	return out
+}
+
+func fact(n int) int {
+	total := 1
+	for n > 0 {
+		total *= n
+		n--
+	}
+	return total
 }
